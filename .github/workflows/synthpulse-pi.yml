@@ -14,7 +14,18 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - name: Build own hyperframes with Synthwave provider catalogue
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Install locked source dependencies
+        timeout-minutes: 10
+        run: bun install --frozen-lockfile --verbose
+      - name: Compile own source
+        timeout-minutes: 15
+        run: bun run build
+      - name: Build own HyperFrames runtime
         run: docker build -f packaging/pi/Dockerfile -t synthpulse-hyperframes-pi:${GITHUB_SHA} .
       - name: Validate and archive
         run: |
